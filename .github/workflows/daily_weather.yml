@@ -1,24 +1,23 @@
 name: Daily Pulse Bot
 
 on:
+  workflow_dispatch:
+
   schedule:
     - cron: '30 2 * * *'
-
-  workflow_dispatch:
 
 jobs:
   weather:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
@@ -27,9 +26,3 @@ jobs:
       - name: Run Bot
         run: |
           python pulse_bot.py
-
-      - name: Upload Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: pulse-reports
-          path: summaries/
