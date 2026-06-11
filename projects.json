@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-06-11T07:37:16.896656Z",
+  "github_username": "krishnajithck",
+  "repository_count": 3,
+  "projects": [
+    {
+      "name": "weather-bot",
+      "description": "This is a weather automation bot that shows the live weather report+quote for a user.",
+      "html_url": "https://github.com/Krishnajithck/weather-bot",
+      "language": "Python",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2026-06-11T07:37:08Z",
+      "homepage": ""
+    },
+    {
+      "name": "Website",
+      "description": "This is an sep study",
+      "html_url": "https://github.com/Krishnajithck/Website",
+      "language": "Python",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2026-03-07T04:37:53Z",
+      "homepage": ""
+    },
+    {
+      "name": "Krishnajithck",
+      "description": "",
+      "html_url": "https://github.com/Krishnajithck/Krishnajithck",
+      "language": "",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2025-09-16T06:46:12Z",
+      "homepage": ""
+    }
+  ]
+}
