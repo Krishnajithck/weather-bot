@@ -12,52 +12,111 @@ SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
 
 
 def fetch_html(url):
-    response = requests.get(url, timeout=20)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers, timeout=20)
     response.raise_for_status()
     return response.text
 
 
 def parse_bbc():
-    html = fetch_html("https://www.bbc.com/news")
-    soup = BeautifulSoup(html, "html.parser")
-    headlines = []
-    for link in soup.select("a.gs-c-promo-heading")[:5]:
-        title = link.get_text(strip=True)
-        href = link.get("href")
-        if not href:
-            continue
-        if href.startswith("/"):
-            href = f"https://www.bbc.com{href}"
-        headlines.append({"source": "BBC News", "title": title, "url": href})
-    return headlines
+    try:
+        html = fetch_html("https://www.bbc.com/news")
+        soup = BeautifulSoup(html, "html.parser")
+        headlines = []
+        
+        # Try multiple selectors for BBC
+        selectors = [
+            "a.sc-4fedabbc-3",  # BBC news link class
+            "a[data-testid='internal-link']",  # BBC internal links
+            "h2 a",  # Generic h2 links
+            "h3 a",  # Generic h3 links
+        ]
+        
+        for selector in selectors:
+            links = soup.select(selector)
+            for link in links[:5]:
+                title = link.get_text(strip=True)
+                href = link.get("href")
+                if not href or not title or len(title) < 5:
+                    continue
+                if href.startswith("/"):
+                    href = f"https://www.bbc.com{href}"
+                if "bbc.com" in href:
+                    headlines.append({"source": "BBC News", "title": title, "url": href})
+            if headlines:
+                break
+        
+        return headlines[:5]
+    except Exception as e:
+        print(f"BBC parsing error: {e}")
+        return []
 
 
 def parse_cnn():
-    html = fetch_html("https://edition.cnn.com")
-    soup = BeautifulSoup(html, "html.parser")
-    headlines = []
-    for item in soup.select("h3.cd__headline a")[:5]:
-        title = item.get_text(strip=True)
-        href = item.get("href")
-        if not href:
-            continue
-        if href.startswith("/"):
-            href = f"https://edition.cnn.com{href}"
-        headlines.append({"source": "CNN", "title": title, "url": href})
-    return headlines
+    try:
+        html = fetch_html("https://edition.cnn.com")
+        soup = BeautifulSoup(html, "html.parser")
+        headlines = []
+        
+        # Try multiple selectors for CNN
+        selectors = [
+            "span.container__headline-text",  # CNN headline text
+            "a.container__link",  # CNN container links
+            "h3 a",  # Generic h3 links
+            "a[data-link-type='story-link']",  # Story links
+        ]
+        
+        for selector in selectors:
+            links = soup.select(selector)
+            for link in links[:5]:
+                title = link.get_text(strip=True)
+                href = link.get("href") if link.name == "a" else link.parent.get("href")
+                if not href or not title or len(title) < 5:
+                    continue
+                if href.startswith("/"):
+                    href = f"https://edition.cnn.com{href}"
+                if "cnn.com" in href:
+                    headlines.append({"source": "CNN", "title": title, "url": href})
+            if headlines:
+                break
+        
+        return headlines[:5]
+    except Exception as e:
+        print(f"CNN parsing error: {e}")
+        return []
 
 
 def parse_techcrunch():
-    html = fetch_html("https://techcrunch.com")
-    soup = BeautifulSoup(html, "html.parser")
-    headlines = []
-    for item in soup.select("a.post-block__title__link")[:5]:
-        title = item.get_text(strip=True)
-        href = item.get("href")
-        if not href:
-            continue
-        headlines.append({"source": "TechCrunch", "title": title, "url": href})
-    return headlines
+    try:
+        html = fetch_html("https://techcrunch.com")
+        soup = BeautifulSoup(html, "html.parser")
+        headlines = []
+        
+        # Try multiple selectors for TechCrunch
+        selectors = [
+            "a.post-block__title__link",  # Original selector
+            "h2.post-block__title a",  # Alternative h2 links
+            "a.post-block__content__link",  # Content links
+            "h3 a",  # Generic h3 links
+        ]
+        
+        for selector in selectors:
+            links = soup.select(selector)
+            for link in links[:5]:
+                title = link.get_text(strip=True)
+                href = link.get("href")
+                if not href or not title or len(title) < 5:
+                    continue
+                headlines.append({"source": "TechCrunch", "title": title, "url": href})
+            if headlines:
+                break
+        
+        return headlines[:5]
+    except Exception as e:
+        print(f"TechCrunch parsing error: {e}")
+        return []
 
 
 def fetch_published_at(url):
@@ -119,8 +178,26 @@ if __name__ == "__main__":
     sources.extend(parse_cnn())
     sources.extend(parse_techcrunch())
 
+    # Log what was found
+    print(f"Found {len(sources)} headlines total")
+    for source in sources:
+        print(f"  - {source['source']}: {source['title'][:50]}...")
+
+    if not sources:
+        print("WARNING: No headlines found from any source!")
+        # Create a fallback message
+        sources = [
+            {
+                "source": "System",
+                "title": "No news headlines could be retrieved at this time",
+                "url": "https://www.bbc.com/news",
+                "published_at": datetime.utcnow().isoformat() + "Z"
+            }
+        ]
+
     for item in sources:
-        item["published_at"] = fetch_published_at(item["url"]) or "Unknown"
+        if "published_at" not in item:
+            item["published_at"] = fetch_published_at(item["url"]) or "Unknown"
 
     email_html = build_email(sources)
     subject = "Daily News Digest — BBC, CNN, TechCrunch"
