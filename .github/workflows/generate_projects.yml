@@ -1,5 +1,8 @@
 name: Generate GitHub Projects JSON
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -15,6 +18,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Setup Python
         uses: actions/setup-python@v5
