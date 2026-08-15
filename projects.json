@@ -1,8 +1,18 @@
 {
-  "generated_at": "2026-08-14T02:24:13.226164Z",
+  "generated_at": "2026-08-15T01:36:06.635752Z",
   "github_username": "krishnajithck",
   "repository_count": 4,
   "projects": [
+    {
+      "name": "weather-bot",
+      "description": "This is a weather automation bot that shows the live weather report+quote for a user.",
+      "html_url": "https://github.com/Krishnajithck/weather-bot",
+      "language": "Python",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2026-08-14T02:24:17Z",
+      "homepage": ""
+    },
     {
       "name": "Django-React-Web",
       "description": "This is a website made using django and react ",
@@ -11,16 +21,6 @@
       "stargazers_count": 0,
       "forks_count": 0,
       "updated_at": "2026-08-13T09:43:20Z",
-      "homepage": ""
-    },
-    {
-      "name": "weather-bot",
-      "description": "This is a weather automation bot that shows the live weather report+quote for a user.",
-      "html_url": "https://github.com/Krishnajithck/weather-bot",
-      "language": "Python",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "updated_at": "2026-08-13T02:26:05Z",
       "homepage": ""
     },
     {
